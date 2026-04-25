@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FabriQ — Lagos fabric, on demand</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: #faf7f2; color: #1a1a1a; line-height: 1.5;
+  }
+  header {
+    padding: 28px 48px; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #ece7df;
+  }
+  .logo { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: #d4621a; }
+  nav a { margin-left: 28px; color: #555; text-decoration: none; font-size: 14px; }
+  .hero {
+    padding: 64px 48px 32px; max-width: 1100px; margin: 0 auto; text-align: center;
+  }
+  .hero h1 {
+    font-size: 52px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 16px;
+  }
+  .hero h1 em { color: #d4621a; font-style: normal; }
+  .hero p { font-size: 18px; color: #555; max-width: 620px; margin: 0 auto 28px; }
+  .cta {
+    background: #1a1a1a; color: #faf7f2; padding: 14px 28px; border-radius: 100px;
+    border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .cta:hover { background: #d4621a; }
+  section { padding: 48px; max-width: 1200px; margin: 0 auto; }
+  h2 { font-size: 32px; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .subhead { color: #777; margin-bottom: 28px; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+  }
+  .supplier {
+    background: white; border-radius: 12px; overflow: hidden; border: 1px solid #ece7df;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .supplier:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+  .supplier .swatch { height: 140px; }
+  .supplier .body { padding: 16px; }
+  .supplier h3 { font-size: 16px; margin-bottom: 4px; }
+  .supplier .loc { font-size: 13px; color: #d4621a; margin-bottom: 8px; }
+  .supplier .meta { font-size: 12px; color: #666; display: flex; gap: 12px; flex-wrap: wrap; }
+  .supplier .tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: #f3eee5; padding: 3px 8px; border-radius: 4px; font-size: 11px; color: #5a4a30; }
+
+  /* Designer */
+  .designer {
+    background: white; border-radius: 16px; padding: 32px; border: 1px solid #ece7df;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px;
+  }
+  .controls label {
+    display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #777; margin: 16px 0 8px;
+  }
+  .controls input[type="text"] {
+    width: 100%; padding: 12px 14px; border: 1px solid #d8d2c5; border-radius: 8px;
+    font-size: 14px; font-family: inherit;
+  }
+  .fabric-row, .style-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fabric-opt, .style-opt {
+    border: 2px solid transparent; border-radius: 8px; cursor: pointer; padding: 4px;
+    background: #f8f5ef; text-align: center; font-size: 12px; transition: border-color 0.15s;
+    flex: 1; min-width: 70px;
+  }
+  .fabric-opt.active, .style-opt.active { border-color: #d4621a; }
+  .fabric-opt .swatch-mini { height: 50px; border-radius: 4px; margin-bottom: 4px; }
+  .style-opt { padding: 10px 12px; }
+  .color-row { display: flex; gap: 8px; }
+  .color-opt {
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .color-opt.active { border-color: #1a1a1a; box-shadow: 0 0 0 2px white inset; }
+  .gen-btn {
+    width: 100%; margin-top: 24px; padding: 14px; background: #1a1a1a; color: white;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .gen-btn:hover { background: #d4621a; }
+
+  .preview { display: flex; flex-direction: column; align-items: center; }
+  .preview-label { font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .render {
+    width: 360px; height: 360px; border-radius: 12px; position: relative; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .render .fabric-base { position: absolute; inset: 0; }
+  .render .print-layer {
+    position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0.92;
+  }
+  .render .shadow-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 30% 30%, transparent 30%, rgba(0,0,0,0.18) 100%);
+  }
+  .render .loading {
+    position: absolute; inset: 0; background: rgba(250,247,242,0.95);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    color: #555; font-size: 14px; z-index: 10;
+  }
+  .spinner {
+    width: 32px; height: 32px; border: 3px solid #ece7df; border-top-color: #d4621a;
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .send-row { margin-top: 16px; display: flex; gap: 8px; }
+  .send-row select {
+    flex: 1; padding: 10px 12px; border: 1px solid #d8d2c5; border-radius: 8px;
+    font-size: 13px; background: white;
+  }
+  .send-btn {
+    background: #d4621a; color: white; border: none; padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: white; padding: 14px 24px; border-radius: 100px;
+    font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Fabric textures (CSS-only) */
+  .fabric-cotton { background:
+    repeating-linear-gradient(45deg, #f5ede0 0 2px, #ebe0cd 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 3px);
+    background-blend-mode: multiply;
+  }
+  .fabric-linen { background:
+    repeating-linear-gradient(0deg, #ecdfc4 0 3px, #ddd0b0 3px 6px),
+    repeating-linear-gradient(90deg, rgba(80,60,30,0.08) 0 1px, transparent 1px 5px);
+  }
+  .fabric-silk { background:
+    linear-gradient(135deg, #f7e8d0, #ead4a8 40%, #f5deb3 70%, #d4b88a);
+    box-shadow: inset 0 0 80px rgba(255,255,255,0.3);
+  }
+  .fabric-denim { background:
+    repeating-linear-gradient(45deg, #2a4d6e 0 1px, #1f3a55 1px 3px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 4px);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Fabri<span>Q</span></div>
+  <nav>
+    <a href="#suppliers">Suppliers</a>
+    <a href="#designer">Custom prints</a>
+    <a href="#">Sign in</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>Lagos fabric, <em>on demand</em>.</h1>
+  <p>Match with verified textile producers across Lagos and the South-West. Design custom prints with AI and send straight to a mill — sample in your hands in 48 hours.</p>
+  <button class="cta" onclick="document.getElementById('designer').scrollIntoView({behavior:'smooth'})">Design a custom print →</button>
+</div>
+
+<section id="suppliers">
+  <h2>Verified suppliers near you</h2>
+  <p class="subhead">8 mills, weavers, and print houses within 60km of Lagos Island.</p>
+  <div class="grid" id="supplier-grid"></div>
+</section>
+
+<section id="designer">
+  <h2>Design your custom print</h2>
+  <p class="subhead">Describe what you want. We'll render it on real fabric and route it to the right mill.</p>
+
+  <div class="designer">
+    <div class="controls">
+      <label>Describe your print</label>
+      <input type="text" id="prompt" value="bold geometric Adire pattern, indigo and gold" placeholder="e.g. floral motif, deep emerald and rust"/>
+
+      <label>Style</label>
+      <div class="style-row" id="style-row">
+        <div class="style-opt active" data-style="geometric">Geometric</div>
+        <div class="style-opt" data-style="floral">Floral</div>
+        <div class="style-opt" data-style="adire">Adire</div>
+        <div class="style-opt" data-style="abstract">Abstract</div>
+      </div>
+
+      <label>Color palette</label>
+      <div class="color-row" id="color-row">
+        <div class="color-opt active" data-color="#1a3a6b" style="background:#1a3a6b"></div>
+        <div class="color-opt" data-color="#c0392b" style="background:#c0392b"></div>
+        <div class="color-opt" data-color="#27632a" style="background:#27632a"></div>
+        <div class="color-opt" data-color="#b8860b" style="background:#b8860b"></div>
+        <div class="color-opt" data-color="#5e2e8f" style="background:#5e2e8f"></div>
+        <div class="color-opt" data-color="#1a1a1a" style="background:#1a1a1a"></div>
+      </div>
+
+      <label>Fabric base</label>
+      <div class="fabric-row" id="fabric-row">
+        <div class="fabric-opt active" data-fabric="cotton">
+          <div class="swatch-mini fabric-cotton"></div>Cotton
+        </div>
+        <div class="fabric-opt" data-fabric="linen">
+          <div class="swatch-mini fabric-linen"></div>Linen
+        </div>
+        <div class="fabric-opt" data-fabric="silk">
+          <div class="swatch-mini fabric-silk"></div>Silk
+        </div>
+        <div class="fabric-opt" data-fabric="denim">
+          <div class="swatch-mini fabric-denim"></div>Denim
+        </div>
+      </div>
+
+      <button class="gen-btn" onclick="generate()">Generate print →</button>
+    </div>
+
+    <div class="preview">
+      <div class="preview-label">Live render on selected fabric</div>
+      <div class="render" id="render">
+        <div class="fabric-base fabric-cotton"></div>
+        <div class="print-layer" id="print-layer"></div>
+        <div class="shadow-overlay"></div>
+      </div>
+
+      <div class="send-row">
+        <select id="supplier-select">
+          <option>Send to: Idumota Linen House (1 day, MOQ 50m)</option>
+          <option>Send to: Ikeja Print Studios (7 days, MOQ 5m)</option>
+          <option>Send to: Adire Heritage Mills (5 days, MOQ 10m)</option>
+        </select>
+        <button class="send-btn" onclick="sendToSupplier()">Request sample</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== SUPPLIERS =====
+const suppliers = [
+  { name: "Balogun Textiles Co.", loc: "Lagos Island", swatch: "linear-gradient(135deg,#d4621a,#f4a261)",
+    materials: ["Ankara", "Wax print", "Cotton blend"], moq: "20m", lead: "2 days" },
+  { name: "Adire Heritage Mills", loc: "Abeokuta · 80km", swatch: "linear-gradient(135deg,#1a3a6b,#3a5a8b)",
+    materials: ["Adire", "Hand-dyed cotton", "Indigo"], moq: "10m", lead: "5 days" },
+  { name: "Aso Oke Weavers Collective", loc: "Iseyin · 200km", swatch: "linear-gradient(135deg,#b8860b,#d4af37)",
+    materials: ["Aso Oke", "Hand-loomed silk"], moq: "5m", lead: "14 days" },
+  { name: "Idumota Linen House", loc: "Idumota Market", swatch: "linear-gradient(135deg,#ecdfc4,#c2b280)",
+    materials: ["Linen", "Cotton", "Bamboo blend"], moq: "50m", lead: "1 day" },
+  { name: "Lekki Silk Imports", loc: "Lekki Phase 1", swatch: "linear-gradient(135deg,#f7e8d0,#d4b88a)",
+    materials: ["Silk", "Satin", "Chiffon"], moq: "15m", lead: "3 days" },
+  { name: "Ojuelegba Denim Mills", loc: "Surulere", swatch: "linear-gradient(135deg,#2a4d6e,#1f3a55)",
+    materials: ["Denim", "Twill", "Canvas"], moq: "30m", lead: "4 days" },
+  { name: "Yaba Tech Textiles", loc: "Yaba", swatch: "linear-gradient(135deg,#27632a,#3d8b40)",
+    materials: ["Performance", "Spandex", "Tencel"], moq: "25m", lead: "5 days" },
+  { name: "Ikeja Print Studios", loc: "Ikeja GRA", swatch: "linear-gradient(135deg,#5e2e8f,#9b6dc0)",
+    materials: ["Custom screen print", "Digital print"], moq: "5m", lead: "7 days" },
+];
+
+const grid = document.getElementById('supplier-grid');
+suppliers.forEach(s => {
+  grid.innerHTML += `
+    <div class="supplier">
+      <div class="swatch" style="background:${s.swatch}"></div>
+      <div class="body">
+        <h3>${s.name}</h3>
+        <div class="loc">📍 ${s.loc}</div>
+        <div class="meta"><span>MOQ ${s.moq}</span><span>•</span><span>${s.lead}</span></div>
+        <div class="tags">${s.materials.map(m => `<span class="tag">${m}</span>`).join('')}</div>
+      </div>
+    </div>
+  `;
+});
+
+// ===== STATE =====
+let state = { style: 'geometric', color: '#1a3a6b', fabric: 'cotton', prompt: '' };
+
+// Wire up selectors
+function bindGroup(rowId, key, cb) {
+  document.querySelectorAll(`#${rowId} > div`).forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll(`#${rowId} > div`).forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+      state[key] = el.dataset[key];
+      cb && cb();
+    });
+  });
+}
+bindGroup('style-row', 'style');
+bindGroup('color-row', 'color');
+bindGroup('fabric-row', 'fabric', () => {
+  const base = document.querySelector('.render .fabric-base');
+  base.className = 'fabric-base fabric-' + state.fabric;
+});
+
+// ===== PRINT GENERATION =====
+// Generate an SVG pattern based on style + color, with a touch of randomness from the prompt
+function hashStr(s) { let h = 0; for (let c of s) h = ((h<<5)-h+c.charCodeAt(0))|0; return Math.abs(h); }
+
+function makePattern(style, color, seed) {
+  const tile = 80;
+  let inner = '';
+  if (style === 'geometric') {
+    const variant = seed % 3;
+    if (variant === 0) {
+      inner = `
+        <polygon points="40,5 75,25 75,55 40,75 5,55 5,25" fill="${color}" opacity="0.85"/>
+        <polygon points="40,20 60,30 60,50 40,60 20,50 20,30" fill="none" stroke="${color}" stroke-width="2"/>
+      `;
+    } else if (variant === 1) {
+      inner = `
+        <rect x="10" y="10" width="60" height="60" fill="none" stroke="${color}" stroke-width="3"/>
+        <rect x="25" y="25" width="30" height="30" fill="${color}"/>
+        <circle cx="40" cy="40" r="6" fill="white"/>
+      `;
+    } else {
+      inner = `
+        <path d="M0,40 L40,0 L80,40 L40,80 Z" fill="${color}" opacity="0.7"/>
+        <path d="M20,40 L40,20 L60,40 L40,60 Z" fill="white" opacity="0.6"/>
+      `;
+    }
+  } else if (style === 'floral') {
+    inner = `
+      <g transform="translate(40,40)">
+        ${[0,60,120,180,240,300].map(a => `
+          <ellipse cx="0" cy="-18" rx="8" ry="16" fill="${color}" opacity="0.85"
+            transform="rotate(${a})"/>
+        `).join('')}
+        <circle r="6" fill="${color}"/>
+      </g>
+      <circle cx="10" cy="10" r="3" fill="${color}" opacity="0.5"/>
+      <circle cx="70" cy="70" r="3" fill="${color}" opacity="0.5"/>
+    `;
+  } else if (style === 'adire') {
+    // Adire-inspired: indigo dot clusters and concentric circles
+    inner = `
+      <circle cx="40" cy="40" r="22" fill="none" stroke="${color}" stroke-width="2"/>
+      <circle cx="40" cy="40" r="14" fill="none" stroke="${color}" stroke-width="2"/>
+      <circle cx="40" cy="40" r="6" fill="${color}"/>
+      ${[[10,10],[70,10],[10,70],[70,70]].map(([x,y]) =>
+        `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`).join('')}
+    `;
+  } else { // abstract
+    inner = `
+      <path d="M10,40 Q30,10 50,40 T80,40" stroke="${color}" stroke-width="4" fill="none"/>
+      <path d="M10,55 Q30,25 50,55 T80,55" stroke="${color}" stroke-width="3" fill="none" opacity="0.6"/>
+      <circle cx="${20 + (seed%30)}" cy="${20 + (seed%30)}" r="8" fill="${color}" opacity="0.5"/>
+    `;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile*2}" height="${tile*2}" viewBox="0 0 ${tile*2} ${tile*2}">
+    <defs>
+      <pattern id="p" patternUnits="userSpaceOnUse" width="${tile}" height="${tile}">
+        ${inner}
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#p)"/>
+  </svg>`;
+  return 'url("data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '")';
+}
+
+function generate() {
+  state.prompt = document.getElementById('prompt').value;
+  const seed = hashStr(state.prompt + state.style);
+
+  // Auto-extract color hint from prompt
+  const colorMap = {
+    indigo: '#1a3a6b', blue: '#1a3a6b', red: '#c0392b', crimson: '#c0392b',
+    green: '#27632a', emerald: '#27632a', gold: '#b8860b', yellow: '#b8860b',
+    purple: '#5e2e8f', violet: '#5e2e8f', black: '#1a1a1a', rust: '#a0522d'
+  };
+  let color = state.color;
+  for (const [word, hex] of Object.entries(colorMap)) {
+    if (state.prompt.toLowerCase().includes(word)) { color = hex; break; }
+  }
+
+  // Show loading
+  const render = document.getElementById('render');
+  const loading = document.createElement('div');
+  loading.className = 'loading';
+  loading.innerHTML = '<div class="spinner"></div>Generating print...';
+  render.appendChild(loading);
+
+  setTimeout(() => {
+    const layer = document.getElementById('print-layer');
+    layer.style.backgroundImage = makePattern(state.style, color, seed);
+    layer.style.backgroundSize = '160px 160px';
+    loading.remove();
+  }, 900);
+}
+
+function sendToSupplier() {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ Sample request sent. Mill will respond within 24h.';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Initial render
+generate();
+</script>
+
+</body>
+</html>
