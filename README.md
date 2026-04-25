@@ -5,7 +5,9 @@
 
 ## What’s in this repo
 
-- `aso-demo.html`: **Main demo** (single-file, no backend).  
+- `index.html`: **Entry point** (deploy this).  
+- `assets/`: CSS + JS for the demo.  
+- `aso-demo.html`: Original single-file version (kept for reference).  
 - `aso-pitch-plan.md`: Pitch + 90s demo script.  
 - `fabriq-demo.html`: Earlier prototype (kept for reference).
 
@@ -13,7 +15,7 @@
 
 No install needed.
 
-1. Open `aso-demo.html` in a browser (Chrome recommended).
+1. Open `index.html` in a browser (Chrome recommended).
 2. Demo flow:
    - Set **location** (state/city)
    - **Search** / filter vendors

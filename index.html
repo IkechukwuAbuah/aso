@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aṣọ — Naija fabric, on demand</title>
+    <meta
+      name="description"
+      content="Glovo for Naija fabric — browse verified vendors by location, filter by market/MOQ/lead time, request samples, and generate custom prints routed to local mills."
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="logo" id="logo">
+          Aṣọ<span class="dot"></span>
+        </div>
+        <button class="loc-selector" id="loc-button" type="button">
+          <span class="pin">📍</span>
+          <span>Deliver to <strong id="loc-display">Lekki Phase 1, Lagos</strong></span>
+          <span class="loc-caret">▾</span>
+        </button>
+        <div class="search">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search Adire, Ankara, Aso Oke, Atiku, lace..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <button class="cart-btn" id="cart-button" type="button">
+          Cart <span class="cart-badge" id="cart-count">0</span>
+        </button>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip active" data-cat="all" type="button">All</button>
+        <button class="chip" data-cat="adire" type="button">Adire</button>
+        <button class="chip" data-cat="ankara" type="button">Ankara · Wax</button>
+        <button class="chip" data-cat="asooke" type="button">Aso Oke</button>
+        <button class="chip" data-cat="lace" type="button">Lace</button>
+        <button class="chip" data-cat="atiku" type="button">Atiku · Senator</button>
+        <button class="chip" data-cat="akwete" type="button">Akwete</button>
+        <button class="chip" data-cat="george" type="button">George Wrapper</button>
+        <button class="chip" data-cat="linen" type="button">Linen · Cotton</button>
+        <button class="chip" data-cat="custom" type="button">Custom Print</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- BROWSE VIEW -->
+      <div class="browse-wrap" id="browse-view">
+        <aside class="filters">
+          <h4>State</h4>
+          <select id="filter-state">
+            <option value="">All states</option>
+            <option>Lagos</option>
+            <option>Ogun</option>
+            <option>Oyo</option>
+            <option>Anambra</option>
+            <option>Abia</option>
+            <option>Rivers</option>
+            <option>Kano</option>
+            <option>Kaduna</option>
+          </select>
+          <h4>Market</h4>
+          <select id="filter-market">
+            <option value="">All markets</option>
+          </select>
+          <h4>Lead time</h4>
+          <div class="filter-group">
+            <label><input type="checkbox" class="filter-lead" value="1-2" /> 1–2 days</label>
+            <label><input type="checkbox" class="filter-lead" value="3-7" /> 3–7 days</label>
+            <label><input type="checkbox" class="filter-lead" value="7+" /> 7+ days</label>
+          </div>
+          <h4>Min order</h4>
+          <div class="filter-group">
+            <label><input type="checkbox" class="filter-moq" value="low" /> Under 10m</label>
+            <label><input type="checkbox" class="filter-moq" value="mid" /> 10–30m</label>
+            <label><input type="checkbox" class="filter-moq" value="high" /> 30m+</label>
+          </div>
+          <button class="clear" id="clear-filters" type="button">Clear filters</button>
+        </aside>
+
+        <div>
+          <div class="hero">
+            <h1>Naija fabric, sourced direct.</h1>
+            <p>
+              From Balogun to Itoku, Aswani to Kantin Kwari — the country's biggest textile
+              markets in one place. Order rolls. Request samples. Print custom.
+            </p>
+            <div class="stats">
+              <div class="stat"><strong>18</strong><span>Verified vendors</span></div>
+              <div class="stat"><strong>9</strong><span>Markets covered</span></div>
+              <div class="stat"><strong>48hr</strong><span>Avg sample delivery</span></div>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <h2>Shop by fabric</h2>
+            <span class="sub">Tap a category to filter</span>
+          </div>
+          <div class="cat-tiles" id="cat-tiles"></div>
+
+          <div class="section-head">
+            <h2 id="grid-title">Vendors near you</h2>
+            <span class="sub" id="grid-count">—</span>
+          </div>
+          <div class="supplier-grid" id="supplier-grid"></div>
+        </div>
+      </div>
+
+      <!-- SUPPLIER DETAIL VIEW -->
+      <div class="detail-wrap" id="detail-view">
+        <button class="back-btn" id="detail-back" type="button">← Back to vendors</button>
+        <div id="detail-content"></div>
+      </div>
+
+      <!-- DESIGNER VIEW -->
+      <div class="designer-wrap" id="designer-view">
+        <button class="back-btn" id="designer-back" type="button">← Back</button>
+        <div class="section-head">
+          <h2>Design your custom print</h2>
+          <span class="sub">AI-generated patterns, printed on real Naija fabric</span>
+        </div>
+        <div class="designer-card">
+          <div class="controls">
+            <label for="prompt">Describe your print</label>
+            <input
+              type="text"
+              id="prompt"
+              value="bold geometric Adire, indigo and gold"
+              placeholder="e.g. floral Asoebi, deep emerald and rust"
+            />
+
+            <label>Style</label>
+            <div class="opt-row" id="style-row">
+              <button class="opt active" data-style="geometric" type="button">Geometric</button>
+              <button class="opt" data-style="floral" type="button">Floral</button>
+              <button class="opt" data-style="adire" type="button">Adire</button>
+              <button class="opt" data-style="abstract" type="button">Abstract</button>
+            </div>
+
+            <label>Color</label>
+            <div class="color-row" id="color-row">
+              <button class="color-opt active" data-color="#1d3a72" style="background:#1d3a72" type="button"></button>
+              <button class="color-opt" data-color="#c0392b" style="background:#c0392b" type="button"></button>
+              <button class="color-opt" data-color="#27632a" style="background:#27632a" type="button"></button>
+              <button class="color-opt" data-color="#c8941a" style="background:#c8941a" type="button"></button>
+              <button class="color-opt" data-color="#5e2e8f" style="background:#5e2e8f" type="button"></button>
+              <button class="color-opt" data-color="#1a1a1a" style="background:#1a1a1a" type="button"></button>
+            </div>
+
+            <label>Fabric base</label>
+            <div class="opt-row" id="fabric-row">
+              <button class="opt active" data-fabric="cotton" type="button">Cotton</button>
+              <button class="opt" data-fabric="linen" type="button">Linen</button>
+              <button class="opt" data-fabric="silk" type="button">Silk</button>
+              <button class="opt" data-fabric="denim" type="button">Denim</button>
+            </div>
+
+            <button class="gen-btn" id="generate-btn" type="button">Generate print →</button>
+          </div>
+
+          <div class="preview-col">
+            <div class="preview-label">Live render on selected fabric</div>
+            <div class="render" id="render">
+              <div class="fabric-base" id="fabric-base"></div>
+              <div class="print-layer" id="print-layer"></div>
+              <div class="shadow-overlay"></div>
+            </div>
+            <div class="send-row">
+              <select id="supplier-select"></select>
+              <button class="btn-primary" id="send-custom" type="button">Send to mill</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- LOCATION MODAL -->
+    <div class="modal" id="loc-modal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-label="Set your location">
+        <h3>Set your location</h3>
+        <p class="modal-sub">
+          We'll sort vendors by distance and show what's available nearby.
+        </p>
+        <select id="loc-state-select"></select>
+        <select id="loc-city-select"></select>
+        <button class="btn-primary" id="save-location" type="button">Save location</button>
+      </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div class="drawer-mask" id="drawer-mask"></div>
+    <aside class="drawer" id="drawer" aria-label="Cart drawer">
+      <div class="drawer-head">
+        <h2>Your samples & orders</h2>
+        <button class="drawer-close" id="drawer-close" type="button">×</button>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+      <div class="drawer-foot">
+        <div class="total">
+          Estimated total <span class="amt" id="cart-total">₦0</span>
+        </div>
+        <button class="btn-primary" id="checkout" type="button">
+          Confirm orders & request samples
+        </button>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./assets/app.js" defer></script>
+  </body>
+</html>
+
