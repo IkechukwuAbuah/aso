@@ -1,0 +1,119 @@
+/* Aṣọ — fabric marketplace brand tokens
+ * Built on EFL Africa Satoshi type scale & spacing rhythm,
+ * reskinned for a Naija textile / fashion product.
+ */
+
+@font-face { font-family: 'Satoshi'; src: url('./fonts/Satoshi-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('./fonts/Satoshi-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('./fonts/Satoshi-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Satoshi'; src: url('./fonts/Satoshi-Black.otf') format('opentype'); font-weight: 900; font-style: normal; font-display: swap; }
+
+:root {
+  /* Brand — Adire indigo + cassava cream + market terracotta */
+  --indigo-900: #0E1330;   /* near-black indigo, primary surfaces & ink */
+  --indigo-800: #1B2150;
+  --indigo-700: #2A3478;
+  --indigo-600: #3D4AA0;
+  --indigo-500: #5260BB;   /* primary accent */
+  --indigo-400: #8189D2;
+  --indigo-200: #C9CDEB;
+  --indigo-100: #E4E6F4;
+  --indigo-50:  #F1F2FA;
+
+  --cream-50:   #FBF7EE;   /* app background — warm cassava cream */
+  --cream-100:  #F5EFE0;
+  --cream-200:  #ECE3CD;
+  --cream-300:  #DDD0AE;
+
+  --clay-700:   #8A3A1F;   /* market terracotta — accents, sale tags */
+  --clay-500:   #C45A2C;   /* primary CTA in Tweak variant */
+  --clay-400:   #DD7A47;
+  --clay-200:   #F2C9A8;
+  --clay-100:   #F8E1CC;
+
+  --leaf-700:   #1F5E3A;   /* deep palm green — success, prints */
+  --leaf-500:   #2E8B4F;
+  --leaf-200:   #A6D9B5;
+
+  --gold-500:   #C9931E;   /* Aso-oke gold accent */
+  --gold-300:   #E4B85B;
+  --gold-100:   #F6E5B5;
+
+  --ink-900:    #14110B;   /* near-black, warm tone */
+  --ink-700:    #2A2620;
+  --ink-500:    #5C5448;
+  --ink-300:    #948A78;
+  --ink-200:    #BDB4A1;
+  --ink-100:    #DDD5C2;
+
+  --line:       #E8DFC9;
+  --line-soft:  #F0E8D2;
+  --surface:    #FFFFFF;
+  --surface-alt:#FBF7EE;
+
+  /* Type */
+  --font-brand: 'Satoshi', system-ui, sans-serif;
+
+  /* Radii — slightly softer than EFL, stays close */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 9999px;
+
+  /* Shadows */
+  --sh-sm: 0 1px 2px rgba(20,17,11,0.06);
+  --sh-md: 0 4px 16px rgba(20,17,11,0.08);
+  --sh-lg: 0 12px 32px rgba(20,17,11,0.12);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--font-brand);
+  color: var(--ink-700);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* utilities */
+.t-display { font-weight: 900; font-size: 32px; line-height: 1.05; letter-spacing: -0.02em; color: var(--ink-900); }
+.t-h1      { font-weight: 700; font-size: 22px; line-height: 1.2;  letter-spacing: -0.01em; color: var(--ink-900); }
+.t-h2      { font-weight: 700; font-size: 18px; line-height: 1.25; color: var(--ink-900); }
+.t-h3      { font-weight: 600; font-size: 16px; line-height: 1.3;  color: var(--ink-900); }
+.t-body    { font-weight: 400; font-size: 14px; line-height: 1.45; color: var(--ink-700); }
+.t-body-sm { font-weight: 400; font-size: 13px; line-height: 1.4;  color: var(--ink-500); }
+.t-caption { font-weight: 500; font-size: 11px; line-height: 1.3;  color: var(--ink-500); letter-spacing: 0.02em; }
+.t-micro   { font-weight: 700; font-size: 10px; line-height: 1.2;  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-500); }
+.t-naira   { font-weight: 700; font-feature-settings: "tnum"; }
+
+/* Adire-pattern utility — subtle indigo dot field, used as decorative bg */
+.bg-adire {
+  background-color: var(--indigo-900);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.06) 1.5px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05) 1.5px, transparent 2px),
+    radial-gradient(circle at 45% 80%, rgba(255,255,255,0.06) 1.5px, transparent 2px),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,0.05) 1px, transparent 1.5px);
+  background-size: 90px 90px, 110px 110px, 70px 70px, 60px 60px;
+}
+
+/* Aso-oke stripe utility — bands of gold/indigo */
+.bg-aso-oke {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--indigo-800) 0 28px,
+      var(--gold-500) 28px 30px,
+      var(--indigo-800) 30px 56px,
+      var(--gold-300) 56px 58px,
+      var(--cream-100) 58px 62px,
+      var(--indigo-800) 62px 90px,
+      var(--clay-500) 90px 93px,
+      var(--indigo-800) 93px 120px
+    );
+}
+
+/* hide scrollbars in artboards */
+.no-scroll::-webkit-scrollbar { display: none; }
+.no-scroll { scrollbar-width: none; }

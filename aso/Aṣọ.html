@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Aṣọ — Naija fabric marketplace</title>
+<link rel="stylesheet" href="tokens.css" />
+<style>
+  html, body { background: #f0eee9; height: 100%; }
+  body { margin: 0; }
+  /* phone frame */
+  .phone {
+    width: 390px; height: 800px;
+    border-radius: 44px;
+    background: #14110B;
+    padding: 10px;
+    box-shadow: 0 30px 60px rgba(20,17,11,0.18), 0 0 0 1px rgba(20,17,11,0.08);
+    position: relative;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+    background: var(--cream-50);
+  }
+  /* Notch */
+  .phone::before {
+    content: ''; position: absolute;
+    top: 18px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 30px; border-radius: 16px;
+    background: #14110B; z-index: 50;
+  }
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" fill="#0E1330"/>
+  <circle cx="50" cy="50" r="22" fill="none" stroke="#C9931E" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="11" fill="none" stroke="#C9931E" stroke-width="1.5"/>
+  <circle cx="50" cy="50" r="3" fill="#C9931E"/>
+</svg>
+</template>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="patterns.jsx"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="screens-1.jsx"></script>
+<script type="text/babel" src="screens-2.jsx"></script>
+<script type="text/babel" src="screens-3.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+function Phone({ children }) {
+  return (
+    <div className="phone">
+      <div className="phone-screen">{children}</div>
+    </div>
+  );
+}
+
+function Root() {
+  return (
+    <DesignCanvas defaultZoom={0.62}>
+      <DCSection id="prototype" title="Aṣọ — Naija fabric marketplace" subtitle="Live prototype · click through every screen. Lagos-first, with vendor markets across Nigeria. Custom prints rendered on real fabric textures.">
+        <DCArtboard id="full" label="◆ Full prototype · click anywhere" width={410} height={820}>
+          <Phone><AsoApp /></Phone>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="entry" title="Entry & location" subtitle="Onboarding tells the Naija story; location filters narrow you down to your state, city, and nearby markets — Glovo-style.">
+        <DCArtboard id="onb" label="01 · Onboarding hero" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'onboarding' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="loc" label="02 · Location picker" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'location' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="home" label="03 · Home — vendors near you" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'home' }} /></Phone>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="discovery" title="Search & discovery" subtitle="Find fabric by material, market, state and city — and see what 8 hand-curated Lagos / Naija vendors actually stock.">
+        <DCArtboard id="srch" label="04 · Search results" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'search' }} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="vendor" label="05 · Vendor — Adire Heritage" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'vendor', id: 'adire-heritage' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="vendor2" label="06 · Vendor — Iseyin Master Weavers" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'vendor', id: 'aso-oke-iseyin' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="fab" label="07 · Fabric detail" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'fabric', id: 'f4' }} withTabs={false} /></Phone>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="cart" title="Cart, checkout, tracking" subtitle="Multi-vendor cart groups by market with separate delivery ETAs. Checkout offers Paystack, transfer and POS-on-delivery — Naija-standard.">
+        <DCArtboard id="cart1" label="08 · Cart — multi-vendor" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'cart' }} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="check" label="09 · Checkout" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'checkout' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="ord" label="10 · Orders" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'orders' }} /></Phone>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="custom" title="The wow — custom prints, any fabric" subtitle="Designer types a prompt, picks a palette, picks a real Naija base fabric. We render the print on the actual fabric texture. Sample ships in 5 days.">
+        <DCArtboard id="des" label="11 · Custom print designer" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'designer' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="suc" label="12 · Order success" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'success' }} withTabs={false} /></Phone>
+        </DCArtboard>
+        <DCArtboard id="prof" label="13 · Profile" width={410} height={820}>
+          <Phone><AsoAppFixed initial={{ name: 'profile' }} /></Phone>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+</script>
+</body>
+</html>
