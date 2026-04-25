@@ -353,7 +353,7 @@ function renderCategoryTiles() {
     if (catId === "custom") return null;
     return VENDORS.filter((v) => (v.cats || []).includes(catId)).length;
   };
-  $("cat-tiles").innerHTML = CATEGORIES.map((c) => {
+  $("cat-tiles").innerHTML = CATEGORIES.map((c, i) => {
     const count = vendorCount(c.id);
     const kind =
       c.id === "custom"
@@ -361,8 +361,11 @@ function renderCategoryTiles() {
         : count != null
           ? `${count} vendor${count === 1 ? "" : "s"}`
           : "Browse";
+    const photo = FABRIQ_PHOTOS[i % FABRIQ_PHOTOS.length];
+    const showPhoto = c.id !== "custom";
     return `
-    <div class="cat-tile ${c.id === "custom" ? "is-custom" : ""}" style="background:${c.bg}" data-cat="${c.id}">
+    <div class="cat-tile ${c.id === "custom" ? "is-custom" : ""}" style="--tile-tint:${c.bg}; background:${c.bg}" data-cat="${c.id}">
+      ${showPhoto ? `<div class="cat-photo" style="background-image:url('${photo}')"></div>` : ""}
       <div class="pat" style="background-image:${fabricPattern(c.pat)}; background-size: 100% 100%;"></div>
       <div class="ct-top">
         <span class="ct-kind">${kind}</span>
