@@ -86,7 +86,32 @@ const appState = {
 };
 
 // ====================================================
-// SVG FABRIC PATTERN GENERATORS
+// REAL PRODUCT PHOTOS (fabriq marketplace)
+// ====================================================
+
+const FABRIQ_PHOTOS = [
+  "assets/images/marketplace/fabriq/f3c20c94-7226-45e9-85c5-83d3ddd482de.JPG",
+  "assets/images/marketplace/fabriq/4212b977-a169-4797-b026-c3d9e3fb908c.JPG",
+  "assets/images/marketplace/fabriq/815a52cd-10a1-4089-8d05-fa540e1389e0.JPG",
+  "assets/images/marketplace/fabriq/ef33dc64-8d12-4be9-9b96-54369fc353a1.JPG",
+  "assets/images/marketplace/fabriq/fd39a5cd-5e42-4258-9d9c-ec9e5a7dbdfc.JPG",
+  "assets/images/marketplace/fabriq/fd5834d4-0f30-44bc-929e-9d1f16eba15d.JPG",
+  "assets/images/marketplace/fabriq/6e9a8ff5-a890-4e3b-bd31-ff87d2e80a1f.JPG",
+  "assets/images/marketplace/fabriq/12903bf0-55a9-4e5a-b51f-10c241030d66.JPG",
+  "assets/images/marketplace/fabriq/70562037-fdbc-4a7b-8c71-bd3d5893375b.JPG",
+  "assets/images/marketplace/fabriq/c548b6ec-245f-4258-a3ad-2caae3675ca6.JPG",
+];
+
+function vendorPhoto(vendorId) {
+  return FABRIQ_PHOTOS[vendorId % FABRIQ_PHOTOS.length];
+}
+
+function inventoryPhoto(vendorId, idx) {
+  return FABRIQ_PHOTOS[(vendorId * 3 + idx) % FABRIQ_PHOTOS.length];
+}
+
+// ====================================================
+// SVG FABRIC PATTERN GENERATORS (fallback for categories / cart)
 // ====================================================
 
 function svgDataUri(svg) {
@@ -362,7 +387,7 @@ function renderSupplierGrid() {
       return `
       <div class="supplier-card" data-vendor="${v.id}">
         <div class="sc-img" style="background:${pat?.bg || "#888"};">
-          <div style="position:absolute;inset:0;background-image:${fabricPattern(pat?.pat || "cotton")};background-size:cover;opacity:0.95"></div>
+          <div style="position:absolute;inset:0;background-image:url('${vendorPhoto(v.id)}');background-size:cover;background-position:center"></div>
           <div class="verified">✓ Verified</div>
           <div class="lead-badge">${v.lead}d delivery</div>
         </div>
@@ -461,7 +486,7 @@ function renderDetail() {
   $("detail-content").innerHTML = `
     <div class="detail-hero">
       <div class="dh-cover" style="background:${pat?.bg || "#888"}">
-        <div style="position:absolute;inset:0;background-image:${fabricPattern(pat?.pat || "cotton")};background-size:cover;opacity:0.9"></div>
+        <div style="position:absolute;inset:0;background-image:url('${vendorPhoto(v.id)}');background-size:cover;background-position:center"></div>
       </div>
       <div class="dh-body">
         <div class="dh-info">
@@ -492,7 +517,7 @@ function renderDetail() {
           .map(
             (item, i) => `
           <div class="inv-card">
-            <div class="inv-img" style="background:${item.bg};background-image:${fabricPattern(item.pat)};background-size:cover"></div>
+            <div class="inv-img" style="background:${item.bg};background-image:url('${inventoryPhoto(v.id, i)}');background-size:cover;background-position:center"></div>
             <div class="inv-body">
               <h4>${item.name}</h4>
               <div class="price">₦${item.price.toLocaleString()}/metre</div>
@@ -611,7 +636,7 @@ function renderCart() {
         .map(
           (item) => `
         <div class="cart-item">
-          <div class="ci-img" style="background:var(--cream-2);background-image:${fabricPattern("cotton")};background-size:cover"></div>
+          <div class="ci-img" style="background:var(--cream-2);background-image:url('${vendorPhoto(item.vendorId)}');background-size:cover;background-position:center"></div>
           <div class="ci-info">
             <h4>${item.name}</h4>
             <div class="ci-meta">${item.qty}m · ₦${item.price.toLocaleString()}/m</div>
