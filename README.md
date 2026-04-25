@@ -10,7 +10,7 @@
 - `aso-demo.html`: Original single-file version (kept for reference).  
 - `aso-pitch-plan.md`: Pitch + 90s demo script.  
 - `fabriq-demo.html`: Earlier prototype (kept for reference).
-- `aso/Aṣọ.html`: **Mobile design prototype** — 13-screen React build from Claude Design (full demo flow in a phone frame). Requires a local HTTP server.
+- `mobile/`: **Mobile design prototype** — 13-screen React build from Claude Design (full demo flow in a phone frame). Live at <https://ikechukwuabuah.github.io/aso/mobile/>. Requires a local HTTP server when running locally.
 
 ## Run locally
 
@@ -24,10 +24,10 @@ No install needed.
    - Confirm **sample requests**
    - Go to **Custom Print** → generate → “Send to mill”
 
-For the mobile design prototype (`aso/Aṣọ.html`):
+For the mobile design prototype (`mobile/`):
 
 1. From the repo root, start a static server: `python3 -m http.server 8765`
-2. Open <http://localhost:8765/aso/A%E1%B9%A3%E1%BB%8D.html>
+2. Open <http://localhost:8765/mobile/>
 3. Click the “Full prototype” artboard, then walk: location → home → vendor → fabric → cart → checkout → success.
 
 ## Demo talking points (quick)

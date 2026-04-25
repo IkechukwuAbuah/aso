@@ -83,7 +83,12 @@ const appState = {
   designFabric: "cotton",
   designPrompt: "",
   cart: [],
+  orders: [],
+  paystackPending: null,
 };
+
+const ORDER_STEPS = ["Confirmed", "Preparing", "In transit", "Delivered"];
+const ORDER_STEP_MS = 6000;
 
 // ====================================================
 // REAL PRODUCT PHOTOS (fabriq marketplace)
@@ -344,17 +349,32 @@ function vendorMatchesFilters(v) {
 }
 
 function renderCategoryTiles() {
-  $("cat-tiles").innerHTML = CATEGORIES.map(
-    (c) => `
-    <div class="cat-tile" style="background:${c.bg}" data-cat="${c.id}">
+  const vendorCount = (catId) => {
+    if (catId === "custom") return null;
+    return VENDORS.filter((v) => (v.cats || []).includes(catId)).length;
+  };
+  $("cat-tiles").innerHTML = CATEGORIES.map((c) => {
+    const count = vendorCount(c.id);
+    const kind =
+      c.id === "custom"
+        ? "AI Studio"
+        : count != null
+          ? `${count} vendor${count === 1 ? "" : "s"}`
+          : "Browse";
+    return `
+    <div class="cat-tile ${c.id === "custom" ? "is-custom" : ""}" style="background:${c.bg}" data-cat="${c.id}">
       <div class="pat" style="background-image:${fabricPattern(c.pat)}; background-size: 100% 100%;"></div>
+      <div class="ct-top">
+        <span class="ct-kind">${kind}</span>
+        <span class="ct-arrow" aria-hidden="true">→</span>
+      </div>
       <div class="label-wrap">
         <h3>${c.label}</h3>
         <div class="ct-meta">${c.desc}</div>
       </div>
     </div>
-  `,
-  ).join("");
+  `;
+  }).join("");
 }
 
 function populateMarketFilter() {
@@ -660,11 +680,169 @@ function checkout() {
     showToast("Cart is empty");
     return;
   }
-  const vendors = [...new Set(appState.cart.map((i) => i.vendorName))];
+  openPaystackMock();
+}
+
+// ====================================================
+// PAYSTACK MOCK CHECKOUT
+// ====================================================
+
+function cartTotal() {
+  return appState.cart.reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function openPaystackMock() {
+  const total = cartTotal();
+  const fmt = `₦${total.toLocaleString()}`;
+  $("ps-amount").textContent = fmt;
+  $("ps-pay-amount").textContent = fmt;
+  const modal = $("paystack-modal");
+  modal.classList.remove("paying");
+  modal.classList.add("show");
+  closeCart();
+}
+
+function closePaystackMock() {
+  const modal = $("paystack-modal");
+  modal.classList.remove("show");
+  modal.classList.remove("paying");
+}
+
+function confirmPaystackMock() {
+  const modal = $("paystack-modal");
+  if (modal.classList.contains("paying")) return;
+  $("ps-email-display").textContent = $("ps-email").value || "demo@aso.ng";
+  modal.classList.add("paying");
+  setTimeout(() => {
+    const order = createOrder();
+    closePaystackMock();
+    openOrders();
+    showToast(`✓ Payment successful · Order ${order.id}`);
+  }, 1200);
+}
+
+// ====================================================
+// ORDERS / DELIVERY TRACKING
+// ====================================================
+
+function createOrder() {
+  const items = appState.cart.map((i) => ({ ...i }));
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const vendors = [...new Set(items.map((i) => i.vendorName))];
+  const order = {
+    id: `ASO-${Math.floor(1000 + Math.random() * 9000)}`,
+    ref: `ps_${Date.now().toString(36)}`,
+    items,
+    vendors,
+    total,
+    createdAt: Date.now(),
+    eta: Date.now() + 25 * 60 * 1000,
+    step: 0,
+  };
+  appState.orders.unshift(order);
   appState.cart = [];
   updateCartUI();
-  closeCart();
-  showToast(`✓ Sample requests sent to ${vendors.length} vendor${vendors.length === 1 ? "" : "s"}. ETA in app.`);
+  updateOrdersUI();
+  scheduleOrderAdvance(order.id);
+  return order;
+}
+
+function scheduleOrderAdvance(orderId) {
+  const tick = () => {
+    const order = appState.orders.find((o) => o.id === orderId);
+    if (!order || order.step >= ORDER_STEPS.length - 1) return;
+    order.step += 1;
+    renderOrders();
+    setTimeout(tick, ORDER_STEP_MS);
+  };
+  setTimeout(tick, ORDER_STEP_MS);
+}
+
+function updateOrdersUI() {
+  const count = appState.orders.length;
+  const badge = $("orders-count");
+  if (badge) badge.textContent = count;
+  const btn = $("orders-button");
+  if (btn) btn.classList.toggle("has-orders", count > 0);
+}
+
+function openOrders() {
+  $("orders-mask").classList.add("show");
+  $("orders-drawer").classList.add("show");
+  renderOrders();
+}
+
+function closeOrders() {
+  $("orders-mask").classList.remove("show");
+  $("orders-drawer").classList.remove("show");
+}
+
+function formatEta(ms) {
+  const diff = Math.max(0, ms - Date.now());
+  const mins = Math.round(diff / 60000);
+  if (mins <= 0) return "Arrived";
+  if (mins === 1) return "Arriving in ~1 min";
+  return `Arriving in ~${mins} min`;
+}
+
+function renderOrders() {
+  const body = $("orders-body");
+  if (!body) return;
+  if (!appState.orders.length) {
+    body.innerHTML = `<div class="drawer-empty">No orders yet.<br/>Pay through Paystack to start tracking.</div>`;
+    return;
+  }
+
+  body.innerHTML = appState.orders
+    .map((order) => {
+      const stepsHtml = ORDER_STEPS.map((label, i) => {
+        const cls = i < order.step ? "done" : i === order.step ? "active" : "";
+        const mark = i < order.step ? "✓" : i + 1;
+        return `
+          <div class="order-step ${cls}">
+            <div class="order-step-dot">${mark}</div>
+            <div class="order-step-label">${label}</div>
+          </div>`;
+      }).join('<div class="order-step-line"></div>');
+
+      const itemsHtml = order.items
+        .map(
+          (item) => `
+          <div class="order-item">
+            <div class="order-item-img" style="background-image:url('${vendorPhoto(item.vendorId)}')"></div>
+            <div class="order-item-info">
+              <div class="order-item-name">${item.name}</div>
+              <div class="order-item-meta">${item.vendorName} · ${item.qty}m</div>
+            </div>
+            <div class="order-item-price">₦${(item.price * item.qty).toLocaleString()}</div>
+          </div>`,
+        )
+        .join("");
+
+      const etaText = order.step >= ORDER_STEPS.length - 1 ? "Delivered" : formatEta(order.eta);
+
+      return `
+        <div class="order-card">
+          <div class="order-head">
+            <div>
+              <div class="order-id">${order.id}</div>
+              <div class="order-ref">${order.ref}</div>
+            </div>
+            <div class="order-total">₦${order.total.toLocaleString()}</div>
+          </div>
+          <div class="order-progress">${stepsHtml}</div>
+          <div class="order-eta">
+            <span class="order-eta-pulse"></span>
+            <span>${etaText}</span>
+          </div>
+          <div class="order-items">${itemsHtml}</div>
+          <div class="order-actions">
+            <button class="order-action" type="button" data-action="message" data-vendor="${order.items[0].vendorId}">Message vendor</button>
+            <button class="order-action" type="button" data-action="track-map">Track on map</button>
+          </div>
+        </div>`;
+    })
+    .join("");
 }
 
 function requestSampleAll(vendorId) {
@@ -866,6 +1044,16 @@ function wireEvents() {
   $("drawer-mask").addEventListener("click", closeCart);
   $("checkout").addEventListener("click", checkout);
 
+  $("orders-button").addEventListener("click", openOrders);
+  $("orders-close").addEventListener("click", closeOrders);
+  $("orders-mask").addEventListener("click", closeOrders);
+
+  $("ps-close").addEventListener("click", closePaystackMock);
+  $("ps-pay").addEventListener("click", confirmPaystackMock);
+  $("paystack-modal").addEventListener("click", (e) => {
+    if (e.target === $("paystack-modal")) closePaystackMock();
+  });
+
   $("generate-btn").addEventListener("click", generate);
   $("send-custom").addEventListener("click", sendCustomToSupplier);
 
@@ -915,6 +1103,11 @@ function wireEvents() {
 
     if (action === "message") {
       messageVendor(Number(actionBtn.dataset.vendor));
+      return;
+    }
+
+    if (action === "track-map") {
+      showToast("📍 Live map view coming soon");
     }
   });
 
@@ -935,6 +1128,13 @@ function init() {
   $("loc-state-select").innerHTML = Object.keys(STATE_CITIES).map((s) => `<option>${s}</option>`).join("");
   $("loc-state-select").value = appState.loc.state;
   populateLocationSelects();
+  updateOrdersUI();
+
+  setInterval(() => {
+    if ($("orders-drawer").classList.contains("show") && appState.orders.length) {
+      renderOrders();
+    }
+  }, 30000);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
